@@ -44,7 +44,8 @@ export default async function handler(req, res) {
       headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({ from: CONTACT_FROM_EMAIL, to: [CONTACT_TO_EMAIL], reply_to: fields.Email, subject, text }),
     });
-    if (!r.ok) return fail(res, 502, "Email provider error");
-    return res.status(200).json({ ok: true });
-  } catch { return fail(res, 502, "Email provider unreachable"); }
+  if (!r.ok) {
+  const details = await r.text();
+  console.error("Resend error:", r.status, details);
+  return fail(res, 502, "Email provider error");
 }
